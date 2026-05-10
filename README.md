@@ -14,6 +14,12 @@ uv venv
 uv sync
 ```
 
+For local (non-Docker) runs, copy env template:
+
+```/dev/null/README.md#L1-1
+cp .env.example .env
+```
+
 ## Run the server
 
 ```/dev/null/README.md#L1-1
@@ -21,6 +27,8 @@ uv run python main.py
 ```
 
 The API will be available at `http://localhost:8000`.
+
+`.env` is loaded automatically by Python via `python-dotenv`.
 
 ## Health check
 
@@ -41,3 +49,19 @@ If you prefer auto-reload during development:
 ```/dev/null/README.md#L1-1
 uv run uvicorn main:app --reload
 ```
+
+## Docker Compose
+
+1. Copy environment template:
+
+```/dev/null/README.md#L1-1
+cp .env.example .env
+```
+
+2. Start API + PostgreSQL:
+
+```/dev/null/README.md#L1-1
+docker compose up --build
+```
+
+The API will be available at `http://localhost:${API_PORT}`.

@@ -19,8 +19,8 @@ WORKDIR /app
 # Copy virtual environment created by uv
 COPY --from=builder /app/.venv /app/.venv
 
-# Copy application source
-COPY main.py pyproject.toml uv.lock /app/
+# Copy application source (all Python modules)
+COPY . /app/
 
 EXPOSE 8000
 
