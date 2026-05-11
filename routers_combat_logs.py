@@ -1,9 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 import crud
 from database import get_db
-from schemas import CombatLogCreate, CombatLogRead, CombatLogUpdate
+from schemas import (
+    CombatLogCreate,
+    CombatLogCreateBatch,
+    CombatLogRead,
+    CombatLogUpdate,
+)
 
 router = APIRouter(prefix="/combat-logs", tags=["combat-logs"])
 
@@ -16,9 +21,24 @@ def create_combat_log(
     return CombatLogRead.model_validate(combat_log)
 
 
+@router.post(
+    "/batch", response_model=list[CombatLogRead], status_code=status.HTTP_201_CREATED
+)
+def create_combat_logs_batch(
+    payload: CombatLogCreateBatch,
+    db: Session = Depends(get_db),
+) -> list[CombatLogRead]:
+    combat_logs = crud.create_combat_logs_batch(db, payload.items)
+    return [CombatLogRead.model_validate(combat_log) for combat_log in combat_logs]
+
+
 @router.get("", response_model=list[CombatLogRead])
-def list_combat_logs(db: Session = Depends(get_db)) -> list[CombatLogRead]:
-    combat_logs = crud.list_combat_logs(db)
+def list_combat_logs(
+    session_id: int | None = Query(default=None),
+    player_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+) -> list[CombatLogRead]:
+    combat_logs = crud.list_combat_logs(db, session_id=session_id, player_id=player_id)
     return [CombatLogRead.model_validate(combat_log) for combat_log in combat_logs]
 
 

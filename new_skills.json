@@ -1,0 +1,818 @@
+{
+  "skill_metadata": {
+    "RV": [
+      {
+        "id": 1,
+        "player_skill_type": "rv",
+        "name": "Blood Pact",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 0 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cb_convert_pct": 0.2,
+          "dmg_buff_pct_per_cb10": 0.1,
+          "duration": 3
+        }
+      },
+      {
+        "id": 2,
+        "player_skill_type": "rv",
+        "name": "Siphon Aura",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cb_spend_pct": 0.2,
+          "heal_flat": 200,
+          "heal_per_cb10_spent": 80
+        }
+      },
+      {
+        "id": 3,
+        "player_skill_type": "rv",
+        "name": "Desperate Prayer",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 1,
+        "sp": 30,
+        "cost": { "mp": 25 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "heal_flat": 200,
+          "conditional_heal": 600,
+          "condition": "target_hp_pct < 0.30"
+        }
+      },
+      {
+        "id": 4,
+        "player_skill_type": "rv",
+        "name": "Boiling Blood",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cb_convert_pct": 0.3,
+          "dmg_buff_pct": 0.2,
+          "duration": 2,
+          "post_hp_current_loss_pct": 0.15
+        }
+      },
+      {
+        "id": 5,
+        "player_skill_type": "rv",
+        "name": "Life Link",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 30 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cb_spend_pct": 0.15,
+          "reflect_pct": 0.4,
+          "dmg_recv_mult": 0.8,
+          "duration": 1
+        }
+      },
+      {
+        "id": 6,
+        "player_skill_type": "rv",
+        "name": "Scorched Earth",
+        "type": "Debuff",
+        "target": "Multiple",
+        "tier": 2,
+        "sp": 50,
+        "cost": { "mp": 0 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cb_convert_pct": 0.25,
+          "enemy_dmg_taken_pct_per_cb10": 0.1,
+          "duration": 1
+        }
+      },
+      {
+        "id": 7,
+        "player_skill_type": "rv",
+        "name": "Frenzy Spores",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 3,
+        "sp": 70,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "dmg_buff_pct_per_cb10": 0.03,
+          "cb_spend_pct_max": 0.3,
+          "extra_dmg_buff_pct_max": 0.3,
+          "self_dmg_taken_mult": 1.2,
+          "duration": 2
+        }
+      },
+      {
+        "id": 8,
+        "player_skill_type": "rv",
+        "name": "Last Stand",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 3,
+        "sp": 80,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "invulnerable": 1,
+          "duration": 2,
+          "post_hp_set": 1,
+          "cb_set_pct": 0.3
+        }
+      },
+      {
+        "id": 9,
+        "player_skill_type": "rv",
+        "name": "Phoenix Ash",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 3,
+        "sp": 100,
+        "cost": { "mp": 50 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "revive_full": true,
+          "sacrifice_caster": true,
+          "target_dmg_taken_mult": 1.3,
+          "duration": 1
+        }
+      },
+      {
+        "id": 10,
+        "player_skill_type": "rv",
+        "name": "Crimson Strike",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15, "hp_current_cost_pct": 0.05 },
+        "stats": { "acc": 0.95, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 200,
+          "bonus_per_cb10": 20
+        }
+      },
+      {
+        "id": 11,
+        "player_skill_type": "rv",
+        "name": "Vampiric Bite",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": { "base_damage": 150, "lifesteal_pct": 0.5 }
+      },
+      {
+        "id": 12,
+        "player_skill_type": "rv",
+        "name": "Ember Seeds",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 20, "hp_current_cost_pct": 0.05 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": { "base_damage": 120 }
+      },
+      {
+        "id": 13,
+        "player_skill_type": "rv",
+        "name": "Blood Rupture",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 35, "hp_current_cost_pct": 0.15 },
+        "stats": { "acc": 0.9, "crit_rate": 0.2, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 400,
+          "cb_required_pct": 0.4,
+          "bonus_damage": 300
+        }
+      },
+      {
+        "id": 14,
+        "player_skill_type": "rv",
+        "name": "Mark of Prey",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 35,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": { "base_damage": 200, "force_taunt": true }
+      },
+      {
+        "id": 15,
+        "player_skill_type": "rv",
+        "name": "Wildfire Dance",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 45 },
+        "stats": { "acc": 0.9, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 250,
+          "dot_self": { "hp_drain_flat": 50, "duration": 2 }
+        }
+      },
+      {
+        "id": 16,
+        "player_skill_type": "rv",
+        "name": "Death's Door",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 3,
+        "sp": 70,
+        "cost": { "mp": 80 },
+        "stats": { "acc": 0.85, "crit_rate": 0.25, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 500,
+          "cb_required_pct": 0.5,
+          "bonus_damage": 600,
+          "cb_gain_pct": 0.2
+        }
+      },
+      {
+        "id": 17,
+        "player_skill_type": "rv",
+        "name": "Volcanic Eruption",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 75,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.8, "crit_rate": 0.2, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 400,
+          "cb_required_pct": 0.4,
+          "bonus_damage": 400,
+          "stun_self": 1
+        }
+      },
+      {
+        "id": 18,
+        "player_skill_type": "rv",
+        "name": "Hemorrhage Wave",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 85,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.8, "crit_rate": 0.2, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 300,
+          "bonus_per_cb10": 50,
+          "cb_required_pct": 0.6,
+          "damage_mult_if_cb": 1.5,
+          "self_hp_set_pct": 0.1
+        }
+      }
+    ],
+    "EL": [
+      {
+        "id": 19,
+        "player_skill_type": "el",
+        "name": "Sprout",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 1,
+        "sp": 15,
+        "cost": { "mp": 0 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": { "frenzy_gain": 3 }
+      },
+      {
+        "id": 20,
+        "player_skill_type": "el",
+        "name": "Morning Dew",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": { "heal_flat": 100, "heal_per_frenzy": 50 }
+      },
+      {
+        "id": 21,
+        "player_skill_type": "el",
+        "name": "Gentle Rain",
+        "type": "Heal/Def",
+        "target": "Team",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": { "team_heal_flat": 80, "team_heal_per_frenzy": 30 }
+      },
+      {
+        "id": 22,
+        "player_skill_type": "el",
+        "name": "Photosynthesis",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 2,
+        "sp": 35,
+        "cost": { "mp": 30 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": { "frenzy_per_turn": 1, "duration": 3 }
+      },
+      {
+        "id": 23,
+        "player_skill_type": "el",
+        "name": "Blooming Save",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 35 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "heal_flat": 200,
+          "heal_per_frenzy": 100,
+          "conditional_bonus_heal_pct": 0.5,
+          "condition": "target_hp_pct < 0.30"
+        }
+      },
+      {
+        "id": 24,
+        "player_skill_type": "el",
+        "name": "Cycle of Life",
+        "type": "Heal/Def",
+        "target": "Team",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "team_heal_flat": 100,
+          "team_heal_per_frenzy_spent": 50,
+          "frenzy_spend_max": 2
+        }
+      },
+      {
+        "id": 25,
+        "player_skill_type": "el",
+        "name": "Spreading Roots",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 3,
+        "sp": 60,
+        "cost": { "mp": 50 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "condition": "enemy_killed_within_3_turns",
+          "team_heal_flat": 100,
+          "frenzy_gain": 2,
+          "duration": 3
+        }
+      },
+      {
+        "id": 26,
+        "player_skill_type": "el",
+        "name": "Jungle Resonance",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 3,
+        "sp": 70,
+        "cost": { "mp": 60 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": { "team_dmg_per_frenzy": 15, "duration": 2 }
+      },
+      {
+        "id": 27,
+        "player_skill_type": "el",
+        "name": "Overgrowth",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 3,
+        "sp": 75,
+        "cost": { "mp": 65 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "effect": {
+          "cleanse_self": true,
+          "frenzy_gain_per_debuff_removed": 2,
+          "frenzy_gain_if_none": 1
+        }
+      },
+      {
+        "id": 28,
+        "player_skill_type": "el",
+        "name": "Vine Whip",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": { "base_damage": 120, "bonus_per_frenzy": 35 }
+      },
+      {
+        "id": 29,
+        "player_skill_type": "el",
+        "name": "Acid Sap",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 100,
+          "bonus_per_frenzy": 80,
+          "consume_all_frenzy": true
+        }
+      },
+      {
+        "id": 30,
+        "player_skill_type": "el",
+        "name": "Seed Gatling",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": { "base_damage": 100, "bonus_per_frenzy": 30 }
+      },
+      {
+        "id": 31,
+        "player_skill_type": "el",
+        "name": "Thorn Pierce",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 35 },
+        "stats": { "acc": 0.95, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 200,
+          "bonus_per_frenzy": 130,
+          "consume_all_frenzy": true
+        }
+      },
+      {
+        "id": 32,
+        "player_skill_type": "el",
+        "name": "Tangle Wood",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 35 },
+        "stats": { "acc": 0.95, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 200,
+          "bonus_per_frenzy": 90,
+          "speed_debuff_pct": 0.5,
+          "consume_all_frenzy": true
+        }
+      },
+      {
+        "id": 33,
+        "player_skill_type": "el",
+        "name": "Chain Bloom",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 0.9, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 200,
+          "frenzy_repeat_threshold": 6,
+          "consume_frenzy_for_repeat": 6,
+          "repeat_hits": 1
+        }
+      },
+      {
+        "id": 34,
+        "player_skill_type": "el",
+        "name": "Carnivorous Bite",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 3,
+        "sp": 70,
+        "cost": { "mp": 85 },
+        "stats": { "acc": 0.85, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 300,
+          "bonus_per_frenzy": 250,
+          "consume_all_frenzy": true
+        }
+      },
+      {
+        "id": 35,
+        "player_skill_type": "el",
+        "name": "Forest Wrath",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 75,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.85, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 200,
+          "bonus_per_frenzy": 120,
+          "consume_all_frenzy": true
+        }
+      },
+      {
+        "id": 36,
+        "player_skill_type": "el",
+        "name": "Harvest Sweep",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 80,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.85, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "effect": {
+          "base_damage": 100,
+          "bonus_per_frenzy": 120,
+          "consume_all_frenzy": true,
+          "team_lifesteal_pct": 0.3
+        }
+      }
+    ],
+    "CE": [
+      {
+        "id": 37,
+        "player_skill_type": "ce",
+        "name": "Weaver's Stance",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 10 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "team_dmg_flat": 150, "duration": 2 },
+        "weather_bonus": { "next_weather": "Sunny" }
+      },
+      {
+        "id": 38,
+        "player_skill_type": "ce",
+        "name": "Healing Dew",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "heal_flat": 300 },
+        "weather_bonus": { "next_weather": "Rainy" }
+      },
+      {
+        "id": 39,
+        "player_skill_type": "ce",
+        "name": "Tangleweed",
+        "type": "Debuff",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "debuff_speed_mult": 0.3 },
+        "weather_bonus": { "next_weather": "Autumn" }
+      },
+      {
+        "id": 40,
+        "player_skill_type": "ce",
+        "name": "Focused Mind",
+        "type": "Buff",
+        "target": "Single",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 35 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "crit_rate_up": 0.5, "duration": 1 },
+        "weather_bonus": { "next_weather": "Sunny" }
+      },
+      {
+        "id": 41,
+        "player_skill_type": "ce",
+        "name": "Harmonic Pulse",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 50 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "debuff_resist": true, "duration": 1 },
+        "weather_bonus": { "next_weather": "Rainy" }
+      },
+      {
+        "id": 42,
+        "player_skill_type": "ce",
+        "name": "Barren Curse",
+        "type": "Debuff",
+        "target": "Single",
+        "tier": 2,
+        "sp": 40,
+        "cost": { "mp": 35 },
+        "stats": { "acc": 0.9, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "debuff_atk_flat": 150 },
+        "weather_bonus": { "next_weather": "Autumn" }
+      },
+      {
+        "id": 43,
+        "player_skill_type": "ce",
+        "name": "Oasis Sanctuary",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 3,
+        "sp": 70,
+        "cost": { "mp": 60 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "weather_lock_turns": 2 },
+        "weather_bonus": { "next_weather": "Sunny" }
+      },
+      {
+        "id": 44,
+        "player_skill_type": "ce",
+        "name": "Deep Roots",
+        "type": "Heal/Def",
+        "target": "Single",
+        "tier": 3,
+        "sp": 75,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "heal_flat": 600, "cleanse_target": true },
+        "weather_bonus": { "next_weather": "Rainy" }
+      },
+      {
+        "id": 45,
+        "player_skill_type": "ce",
+        "name": "Grove Aura",
+        "type": "Buff",
+        "target": "Team",
+        "tier": 3,
+        "sp": 80,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
+        "base_effect": { "team_dmg_flat": 150, "duration": 2 },
+        "weather_bonus": { "next_weather": "Autumn" }
+      },
+      {
+        "id": 46,
+        "player_skill_type": "ce",
+        "name": "Sun Strike",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.05, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 150 },
+        "weather_bonus": { "trigger": "Sunny", "extra_hit": 150 }
+      },
+      {
+        "id": 47,
+        "player_skill_type": "ce",
+        "name": "Aqua Thrust",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 1,
+        "sp": 20,
+        "cost": { "mp": 15 },
+        "stats": { "acc": 0.95, "crit_rate": 0.05, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 150 },
+        "weather_bonus": { "trigger": "Rainy", "self_heal": 150 }
+      },
+      {
+        "id": 48,
+        "player_skill_type": "ce",
+        "name": "Spore Cloud",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 1,
+        "sp": 25,
+        "cost": { "mp": 20 },
+        "stats": { "acc": 0.95, "crit_rate": 0.05, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 80 },
+        "weather_bonus": { "trigger": "Autumn", "sleep_chance": 0.2 }
+      },
+      {
+        "id": 49,
+        "player_skill_type": "ce",
+        "name": "Solar Flare",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 250 },
+        "weather_bonus": {
+          "trigger": "Sunny",
+          "extra_damage": 350,
+          "next_season_bonus": 100
+        }
+      },
+      {
+        "id": 50,
+        "player_skill_type": "ce",
+        "name": "Gale Thief",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 2,
+        "sp": 45,
+        "cost": { "mp": 40 },
+        "stats": { "acc": 0.95, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 300 },
+        "weather_bonus": {
+          "trigger": "Autumn",
+          "purge_buffs": true,
+          "momentum_bonus_pct": 0.3
+        }
+      },
+      {
+        "id": 51,
+        "player_skill_type": "ce",
+        "name": "Thunder Storm",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 2,
+        "sp": 50,
+        "cost": { "mp": 45 },
+        "stats": { "acc": 0.9, "crit_rate": 0.1, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 200 },
+        "weather_bonus": {
+          "trigger": "Rainy",
+          "extra_damage": 100,
+          "next_season_repeat": true
+        }
+      },
+      {
+        "id": 52,
+        "player_skill_type": "ce",
+        "name": "Supernova",
+        "type": "Atk",
+        "target": "Single",
+        "tier": 3,
+        "sp": 80,
+        "cost": { "mp": 85 },
+        "stats": { "acc": 0.9, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 600 },
+        "weather_bonus": {
+          "trigger": "Sunny",
+          "extra_damage": 800,
+          "momentum_bonus_flat": 1200
+        }
+      },
+      {
+        "id": 53,
+        "player_skill_type": "ce",
+        "name": "Blessing of Rain",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 85,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.9, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 350 },
+        "weather_bonus": {
+          "trigger": "Rainy",
+          "team_heal": 400,
+          "next_season_heal": 200,
+          "revive_or_heal": true
+        }
+      },
+      {
+        "id": 54,
+        "player_skill_type": "ce",
+        "name": "Erosion",
+        "type": "Atk",
+        "target": "Multiple",
+        "tier": 3,
+        "sp": 85,
+        "cost": { "mp": 90 },
+        "stats": { "acc": 0.9, "crit_rate": 0.15, "crit_dmg": 1.5 },
+        "base_effect": { "base_damage": 350 },
+        "weather_bonus": {
+          "trigger": "Autumn",
+          "reduce_max_hp_pct": 0.05,
+          "momentum_reduce_max_hp_pct": 0.08
+        }
+      }
+    ]
+  }
+}
