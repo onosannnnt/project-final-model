@@ -134,7 +134,7 @@ def train_kmeans_from_cleaned(
         metrics["silhouette_score"] = float(silhouette_score(feature_df, labels))
 
     artifact = {
-        "algorithm": "minibatch_kmeans",
+        "algorithm": "kmeans",
         "version": version,
         "feature_columns": feature_df.columns.tolist(),
         "model": model,
@@ -419,7 +419,3 @@ def get_project_summary(db: Session) -> dict[str, Any]:
         "latest_comparison_id": latest_comp.id if latest_comp else None,
         "latest_comparison_winner": latest_comp.winner_version if latest_comp else None,
     }
-
-atest_comp else None,
-    }
-
