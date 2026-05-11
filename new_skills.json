@@ -668,7 +668,7 @@
         "sp": 80,
         "cost": { "mp": 20 },
         "stats": { "acc": 1.0, "crit_rate": 0.0, "crit_dmg": 1.5 },
-        "base_effect": { "team_dmg_flat": 150, "duration": 2 },
+        "base_effect": { "team_dmg_flat": 300, "duration": 2 },
         "weather_bonus": { "next_weather": "Autumn" }
       },
       {
