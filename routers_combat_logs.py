@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
@@ -34,7 +36,7 @@ def create_combat_logs_batch(
 
 @router.get("", response_model=list[CombatLogRead])
 def list_combat_logs(
-    session_id: int | None = Query(default=None),
+    session_id: UUID | None = Query(default=None),
     player_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[CombatLogRead]:
@@ -78,3 +80,4 @@ def delete_combat_log(combat_log_id: int, db: Session = Depends(get_db)) -> Resp
 
     crud.delete_combat_log(db, combat_log)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+

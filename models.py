@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from sqlalchemy import (
@@ -8,6 +9,7 @@ from sqlalchemy import (
     Float,
     Integer,
     String,
+    UUID,
     func,
 )
 from sqlalchemy import Enum as SQLEnum
@@ -44,7 +46,7 @@ class CombatLog(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    session_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    session_id: Mapped[uuid.UUID] = mapped_column(UUID, nullable=False, index=True)
     player_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     character_id: Mapped[int] = mapped_column(Integer, nullable=False)
     wave_number: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -76,7 +78,7 @@ class CleanedCombatLog(Base):
     source_combat_log_id: Mapped[int] = mapped_column(
         Integer, nullable=False, index=True
     )
-    session_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    session_id: Mapped[uuid.UUID] = mapped_column(UUID, nullable=False, index=True)
     player_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     cleaned_payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
@@ -108,13 +110,16 @@ class MLPrediction(Base):
     model_version: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     source_type: Mapped[str] = mapped_column(String(64), nullable=False)
     source_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
-    session_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    session_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID, nullable=True, index=True
+    )
     player_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     input_payload: Mapped[dict] = mapped_column(JSON, nullable=False)
     cluster_label: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
 
 
 class MLModelComparison(Base):

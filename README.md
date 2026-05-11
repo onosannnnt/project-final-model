@@ -73,7 +73,7 @@ Run cleaning + feature extraction from `combat_logs` into `cleaned_combat_logs`:
 ```/dev/null/README.md#L1-4
 curl -X POST http://localhost:8000/cleaned-combat-logs/run \
   -H "Content-Type: application/json" \
-  -d '{"session_id": 1001}'
+  -d '{"session_id": "550e8400-e29b-41d4-a716-446655440000"}'
 ```
 
 Use `{"session_id": null}` to process all sessions.
@@ -100,7 +100,7 @@ Create one:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/combat-logs \
   -H "Content-Type: application/json" \
-  -d '{"session_id":1001,"player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}'
+  -d '{"session_id":"550e8400-e29b-41d4-a716-446655440000","player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}'
 ```
 
 Create batch:
@@ -108,7 +108,7 @@ Create batch:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/combat-logs/batch \
   -H "Content-Type: application/json" \
-  -d '{"items":[{"session_id":1001,"player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}]}'
+  -d '{"items":[{"session_id":"550e8400-e29b-41d4-a716-446655440000","player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}]}'
 ```
 
 ### Clean pipeline
@@ -116,7 +116,7 @@ curl -X POST http://localhost:8000/combat-logs/batch \
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/pipeline/clean \
   -H "Content-Type: application/json" \
-  -d '{"session_id":1001}'
+  -d '{"session_id":"550e8400-e29b-41d4-a716-446655440000"}'
 ```
 
 Train model:
@@ -124,7 +124,7 @@ Train model:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/pipeline/train \
   -H "Content-Type: application/json" \
-  -d '{"version":"kmeans_v1","n_clusters":3,"session_ids":[1001]}'
+  -d '{"version":"kmeans_v1","n_clusters":3,"session_ids":["550e8400-e29b-41d4-a716-446655440000"]}'
 ```
 
 Run all (clean + train):
@@ -132,7 +132,7 @@ Run all (clean + train):
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/pipeline/run-all \
   -H "Content-Type: application/json" \
-  -d '{"clean_session_id":1001,"version":"kmeans_v1","n_clusters":3,"train_session_ids":[1001]}'
+  -d '{"clean_session_id":"550e8400-e29b-41d4-a716-446655440000","version":"kmeans_v1","n_clusters":3,"train_session_ids":["550e8400-e29b-41d4-a716-446655440000"]}'
 ```
 
 ### Model lifecycle
@@ -173,7 +173,7 @@ Predict from payload:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/predict \
   -H "Content-Type: application/json" \
-  -d '{"combat_log":{"session_id":1001,"player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}}'
+  -d '{"combat_log":{"session_id":"550e8400-e29b-41d4-a716-446655440000","player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}}'
 ```
 
 Predict from stored combat log:
@@ -187,7 +187,7 @@ Predict batch:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/predict/batch \
   -H "Content-Type: application/json" \
-  -d '{"items":[{"session_id":1001,"player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}]}'
+  -d '{"items":[{"session_id":"550e8400-e29b-41d4-a716-446655440000","player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}]}'
 ```
 
 Predict and save:
@@ -195,14 +195,14 @@ Predict and save:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/predict-and-save \
   -H "Content-Type: application/json" \
-  -d '{"combat_log":{"session_id":1001,"player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}}'
+  -d '{"combat_log":{"session_id":"550e8400-e29b-41d4-a716-446655440000","player_id":10,"character_id":1,"wave_number":1,"turn_index":1,"skill_id":101,"skill_target_id":2,"target_max_hp":1000,"target_current_hp":800,"damage_dealt":120,"damage_recieve":30,"caster_current_sp":5,"caster_current_hp":900,"caster_max_hp":1000,"current_frenzy_stack":2,"heal_amount":0,"current_corrupt_blood_gain":1,"corrupt_blood_by_max_hp":5,"weather":"sunny","momentum_gain":2,"momentum_used":1}}'
 ```
 
 Prediction queries:
 
 ```/dev/null/README.md#L1-3
 curl http://localhost:8000/ml/predictions
-curl http://localhost:8000/ml/predictions?session_id=1001&player_id=10
+curl http://localhost:8000/ml/predictions?session_id=550e8400-e29b-41d4-a716-446655440000&player_id=10
 curl http://localhost:8000/ml/predictions/1
 ```
 
@@ -213,7 +213,7 @@ Compare:
 ```/dev/null/README.md#L1-3
 curl -X POST http://localhost:8000/ml/models/compare \
   -H "Content-Type: application/json" \
-  -d '{"model_versions":["kmeans_v1","kmeans_v2"],"session_ids":[1001]}'
+  -d '{"model_versions":["kmeans_v1","kmeans_v2"],"session_ids":["550e8400-e29b-41d4-a716-446655440000"]}'
 ```
 
 Read comparison results:

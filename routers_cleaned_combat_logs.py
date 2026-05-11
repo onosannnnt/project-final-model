@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -28,7 +30,7 @@ def run_clean_pipeline(
 
 @router.get("", response_model=list[CleanedCombatLogRead])
 def list_cleaned_combat_logs(
-    session_id: int | None = Query(default=None),
+    session_id: UUID | None = Query(default=None),
     player_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[CleanedCombatLogRead]:
@@ -48,8 +50,9 @@ def get_cleaned_combat_log(
 
 @router.delete("/session/{session_id}")
 def delete_cleaned_combat_logs_by_session(
-    session_id: int,
+    session_id: UUID,
     db: Session = Depends(get_db),
 ) -> dict:
     deleted = crud.delete_cleaned_combat_logs_by_session(db, session_id=session_id)
     return {"deleted": deleted, "session_id": session_id}
+

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -7,6 +9,7 @@ import ml_service
 from database import get_db
 from schemas import (
     ActivateModelRequest,
+    CleanCombatLogsRequest,
     CompareModelsRequest,
     CompareModelsResponse,
     MLPredictBatchRequest,
@@ -45,20 +48,20 @@ def ready(db: Session = Depends(get_db)) -> ReadyResponse:
 
 @router.post("/pipeline/clean")
 def pipeline_clean(
-    payload: dict,
+    payload: CleanCombatLogsRequest,
     db: Session = Depends(get_db),
 ) -> dict:
-    session_id = payload.get("session_id")
+    session_id = payload.session_id
     cleaned_logs = crud.clean_combat_logs(db, session_id=session_id)
     return {"inserted": len(cleaned_logs), "session_id": session_id}
 
 
 @router.post("/pipeline/features")
 def pipeline_features(
-    payload: dict,
+    payload: CleanCombatLogsRequest,
     db: Session = Depends(get_db),
 ) -> dict:
-    session_id = payload.get("session_id")
+    session_id = payload.session_id
     cleaned_logs = crud.clean_combat_logs(db, session_id=session_id)
     return {"features_generated": len(cleaned_logs), "session_id": session_id}
 
@@ -308,7 +311,7 @@ def get_prediction(
 
 @router.get("/predictions", response_model=list[MLPredictionRead])
 def list_predictions(
-    session_id: int | None = Query(default=None),
+    session_id: UUID | None = Query(default=None),
     player_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[MLPredictionRead]:
@@ -459,3 +462,4 @@ def stage_complete(
 @router.get("/project-summary", response_model=ProjectSummaryResponse)
 def project_summary(db: Session = Depends(get_db)) -> ProjectSummaryResponse:
     return ProjectSummaryResponse(**ml_service.get_project_summary(db))
+

@@ -1,3 +1,6 @@
+import uuid
+from uuid import UUID
+
 import pandas as pd
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -58,7 +61,7 @@ def create_combat_logs_batch(
 
 def list_combat_logs(
     db: Session,
-    session_id: int | None = None,
+    session_id: UUID | None = None,
     player_id: int | None = None,
 ) -> list[CombatLog]:
     stmt = select(CombatLog)
@@ -97,7 +100,7 @@ def delete_combat_log(db: Session, combat_log: CombatLog) -> None:
 
 def list_cleaned_combat_logs(
     db: Session,
-    session_id: int | None = None,
+    session_id: UUID | None = None,
     player_id: int | None = None,
 ) -> list[CleanedCombatLog]:
     stmt = select(CleanedCombatLog)
@@ -115,7 +118,7 @@ def get_cleaned_combat_log_by_id(
     return db.get(CleanedCombatLog, cleaned_id)
 
 
-def delete_cleaned_combat_logs_by_session(db: Session, session_id: int) -> int:
+def delete_cleaned_combat_logs_by_session(db: Session, session_id: UUID) -> int:
     result = db.execute(
         delete(CleanedCombatLog).where(CleanedCombatLog.session_id == session_id)
     )
@@ -124,7 +127,7 @@ def delete_cleaned_combat_logs_by_session(db: Session, session_id: int) -> int:
 
 
 def clean_combat_logs(
-    db: Session, session_id: int | None = None
+    db: Session, session_id: UUID | None = None
 ) -> list[CleanedCombatLog]:
     query = select(CombatLog)
     if session_id is not None:
@@ -181,7 +184,7 @@ def clean_combat_logs(
     features_df = build_features(raw_df)
     feature_rows = features_df.to_dict(orient="records")
 
-    logs_by_session: dict[int, list[CombatLog]] = {}
+    logs_by_session: dict[UUID, list[CombatLog]] = {}
     for log in combat_logs:
         logs_by_session.setdefault(log.session_id, []).append(log)
 
@@ -192,7 +195,7 @@ def clean_combat_logs(
 
     cleaned_logs: list[CleanedCombatLog] = []
     for feature_row in feature_rows:
-        feature_session_id = int(feature_row["session_id"])
+        feature_session_id = feature_row["session_id"]
         session_logs = logs_by_session.get(feature_session_id, [])
         if not session_logs:
             continue
@@ -214,3 +217,4 @@ def clean_combat_logs(
             db.refresh(cleaned_log)
 
     return cleaned_logs
+

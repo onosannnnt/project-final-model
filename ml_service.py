@@ -4,6 +4,7 @@ import base64
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 import joblib
 import numpy as np
@@ -105,7 +106,7 @@ def train_kmeans_from_cleaned(
     db: Session,
     version: str,
     n_clusters: int = 3,
-    session_ids: list[int] | None = None,
+    session_ids: list[UUID] | None = None,
 ) -> MLModelVersion:
     query = select(CleanedCombatLog)
     if session_ids:
@@ -280,7 +281,7 @@ def save_prediction(
     input_payload: dict[str, Any],
     cluster_label: int,
     source_id: int | None = None,
-    session_id: int | None = None,
+    session_id: UUID | None = None,
     player_id: int | None = None,
 ) -> MLPrediction:
     pred = MLPrediction(
@@ -300,7 +301,7 @@ def save_prediction(
 
 def list_predictions(
     db: Session,
-    session_id: int | None = None,
+    session_id: UUID | None = None,
     player_id: int | None = None,
 ) -> list[MLPrediction]:
     stmt = select(MLPrediction)
@@ -319,7 +320,7 @@ def get_prediction_by_id(db: Session, prediction_id: int) -> MLPrediction | None
 def compare_models(
     db: Session,
     versions: list[str],
-    session_ids: list[int] | None = None,
+    session_ids: list[UUID] | None = None,
 ) -> MLModelComparison:
     if not versions:
         raise ValueError("At least one model version is required.")
@@ -418,3 +419,4 @@ def get_project_summary(db: Session) -> dict[str, Any]:
         "latest_comparison_id": latest_comp.id if latest_comp else None,
         "latest_comparison_winner": latest_comp.winner_version if latest_comp else None,
     }
+

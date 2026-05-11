@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -28,7 +29,7 @@ class UserRead(BaseModel):
 
 
 class CombatLogBase(BaseModel):
-    session_id: int
+    session_id: UUID
     player_id: int
     character_id: int
     wave_number: int
@@ -60,7 +61,7 @@ class CombatLogCreateBatch(BaseModel):
 
 
 class CombatLogUpdate(BaseModel):
-    session_id: int | None = None
+    session_id: UUID | None = None
     player_id: int | None = None
     character_id: int | None = Field(default=None, ge=1, le=2)
     wave_number: int | None = None
@@ -90,13 +91,13 @@ class CombatLogRead(CombatLogBase):
 
 
 class CleanCombatLogsRequest(BaseModel):
-    session_id: int | None = None
+    session_id: UUID | None = None
 
 
 class CleanedCombatLogRead(BaseModel):
     id: int
     source_combat_log_id: int
-    session_id: int
+    session_id: UUID
     player_id: int
     cleaned_payload: dict
     created_at: datetime | None = None
@@ -106,14 +107,14 @@ class CleanedCombatLogRead(BaseModel):
 
 class CleanCombatLogsResponse(BaseModel):
     inserted: int
-    session_id: int | None = None
+    session_id: UUID | None = None
     cleaned_logs: list[CleanedCombatLogRead]
 
 
 class TrainModelRequest(BaseModel):
     version: str
     n_clusters: int = Field(default=3, ge=2, le=20)
-    session_ids: list[int] | None = None
+    session_ids: list[UUID] | None = None
 
 
 class TrainModelResponse(BaseModel):
@@ -149,10 +150,10 @@ class ModelVersionRead(BaseModel):
 
 
 class PipelineRunAllRequest(BaseModel):
-    clean_session_id: int | None = None
+    clean_session_id: UUID | None = None
     version: str
     n_clusters: int = Field(default=3, ge=2, le=20)
-    train_session_ids: list[int] | None = None
+    train_session_ids: list[UUID] | None = None
 
 
 class MLPredictRequest(BaseModel):
@@ -184,7 +185,7 @@ class MLPredictionRead(BaseModel):
     model_version: str
     source_type: str
     source_id: int | None
-    session_id: int | None
+    session_id: UUID | None
     player_id: int | None
     input_payload: dict[str, Any]
     cluster_label: int
@@ -195,13 +196,46 @@ class MLPredictionRead(BaseModel):
 
 class CompareModelsRequest(BaseModel):
     model_versions: list[str]
-    session_ids: list[int] | None = None
+    session_ids: list[UUID] | None = None
 
 
 class CompareModelsResponse(BaseModel):
     comparison_id: int
     winner_version: str | None
     summary: dict[str, Any]
+
+
+class ProjectSummaryResponse(BaseModel):
+    combat_logs: int
+    cleaned_combat_logs: int
+    predictions: int
+    model_versions: int
+    active_model: str | None
+    latest_comparison_id: int | None
+    latest_comparison_winner: str | None
+
+
+class ReadyResponse(BaseModel):
+    api: str
+    database: str
+    active_model: str
+
+
+class StageCompleteRequest(BaseModel):
+    player_id: int
+    combat_logs: list[CombatLogCreate]
+
+
+class StageCompleteResponse(BaseModel):
+    user_id: int
+    previous_type: UserType | None
+    new_type: UserType
+    previous_tier: int | None
+    new_tier: int
+    predicted_cluster: int
+    model_version: str
+    update_mode: str
+
 
 
 class ProjectSummaryResponse(BaseModel):
