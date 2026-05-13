@@ -64,9 +64,7 @@ class CombatLog(Base):
     heal_amount: Mapped[float] = mapped_column(Float, nullable=False)
     current_corrupt_blood_gain: Mapped[float] = mapped_column(Float, nullable=False)
     corrupt_blood_by_max_hp: Mapped[float] = mapped_column(Float, nullable=False)
-    weather: Mapped[WeatherType] = mapped_column(
-        SQLEnum(String, name="weather_type_enum"), nullable=False
-    )
+    weather: Mapped[String] = mapped_column(String, nullable=False)
     momentum_gain: Mapped[int] = mapped_column(Integer, nullable=False)
     momentum_used: Mapped[int] = mapped_column(Integer, nullable=False)
 
