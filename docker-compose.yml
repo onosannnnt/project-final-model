@@ -16,11 +16,11 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - moonbloom-network
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/onosannnnt/project-final-model:latest
     container_name: project-final-model-api
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -30,6 +30,11 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - moonbloom-network
 
 volumes:
   postgres_data:
+networks:
+  moonbloom-network:
+    driver: bridge
