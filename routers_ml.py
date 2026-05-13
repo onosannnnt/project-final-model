@@ -78,6 +78,7 @@ def pipeline_train(
             n_clusters=payload.n_clusters,
             session_ids=payload.session_ids,
         )
+        ml_service.set_active_model(db, model.version)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
@@ -462,4 +463,3 @@ def stage_complete(
 @router.get("/project-summary", response_model=ProjectSummaryResponse)
 def project_summary(db: Session = Depends(get_db)) -> ProjectSummaryResponse:
     return ProjectSummaryResponse(**ml_service.get_project_summary(db))
-

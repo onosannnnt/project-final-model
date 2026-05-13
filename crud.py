@@ -1,6 +1,7 @@
 import uuid
 from uuid import UUID
 
+import numpy as np
 import pandas as pd
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -8,6 +9,25 @@ from sqlalchemy.orm import Session
 from cleaned import build_features
 from models import CleanedCombatLog, CombatLog, User
 from schemas import CombatLogCreate, CombatLogUpdate, UserCreate, UserUpdate
+
+
+def _sanitize_payload(d: dict) -> dict:
+    """Convert all values in a dict to JSON-serialisable Python primitives."""
+    result = {}
+    for k, v in d.items():
+        if isinstance(v, uuid.UUID):
+            result[k] = str(v)
+        elif isinstance(v, (np.integer,)):
+            result[k] = int(v)
+        elif isinstance(v, (np.floating,)):
+            result[k] = float(v)
+        elif isinstance(v, (np.bool_,)):
+            result[k] = bool(v)
+        elif isinstance(v, float) and (np.isnan(v) or np.isinf(v)):
+            result[k] = 0.0
+        else:
+            result[k] = v
+    return result
 
 
 def create_user(db: Session, payload: UserCreate) -> User:
@@ -129,6 +149,16 @@ def delete_cleaned_combat_logs_by_session(db: Session, session_id: UUID) -> int:
 def clean_combat_logs(
     db: Session, session_id: UUID | None = None
 ) -> list[CleanedCombatLog]:
+    """
+    Reads CombatLog rows from DB, runs build_features(), and upserts
+    one CleanedCombatLog per session into cleaned_combat_logs.
+
+    build_features() is expected to return one aggregated row per session_id.
+    Each resulting CleanedCombatLog stores:
+      - session_id / player_id   from the first CombatLog of that session
+      - source_combat_log_id     = id of the first CombatLog of that session
+      - cleaned_payload          = the full feature dict (including session_id as UUID)
+    """
     query = select(CombatLog)
     if session_id is not None:
         query = query.where(CombatLog.session_id == session_id)
@@ -146,8 +176,8 @@ def clean_combat_logs(
     if not combat_logs:
         return []
 
+    # ---------- build raw dataframe ----------
     raw_rows: list[dict] = []
-
     for log in combat_logs:
         raw_rows.append(
             {
@@ -169,10 +199,10 @@ def clean_combat_logs(
                 "heal_amount": log.heal_amount,
                 "current_corrupt_blood_gain": log.current_corrupt_blood_gain,
                 "corrupt_blood_by_max_hp": log.corrupt_blood_by_max_hp,
-                "weather": log.weather.value,
+                "weather": str(log.weather),
                 "momentum_gain": log.momentum_gain,
                 "momentum_used": log.momentum_used,
-                # Optional columns expected by cleaned.build_features
+                # optional columns expected by build_features
                 "break_count": 0,
                 "break_damage": 0.0,
                 "target_debuff_count": 0.0,
@@ -182,31 +212,57 @@ def clean_combat_logs(
 
     raw_df = pd.DataFrame(raw_rows)
     features_df = build_features(raw_df)
-    feature_rows = features_df.to_dict(orient="records")
 
-    logs_by_session: dict[UUID, list[CombatLog]] = {}
+    if features_df.empty:
+        return []
+
+    # ---------- build lookup: session_id -> first CombatLog ----------
+    # Preserves the sorted order from the query above.
+    first_log_by_session: dict[uuid.UUID, CombatLog] = {}
     for log in combat_logs:
-        logs_by_session.setdefault(log.session_id, []).append(log)
+        if log.session_id not in first_log_by_session:
+            first_log_by_session[log.session_id] = log
 
+    # ---------- delete stale cleaned rows for affected sessions ----------
     target_sessions = {log.session_id for log in combat_logs}
     db.execute(
         delete(CleanedCombatLog).where(CleanedCombatLog.session_id.in_(target_sessions))
     )
 
+    # ---------- insert one CleanedCombatLog per feature row ----------
     cleaned_logs: list[CleanedCombatLog] = []
-    for feature_row in feature_rows:
-        feature_session_id = feature_row["session_id"]
-        session_logs = logs_by_session.get(feature_session_id, [])
-        if not session_logs:
+
+    for _, feature_row in features_df.iterrows():
+        # build_features must keep session_id in the output row.
+        raw_session_id = feature_row.get("session_id")
+        if raw_session_id is None:
             continue
 
-        source_log = session_logs[0]
+        # Normalise to uuid.UUID regardless of whether it came back as str/UUID.
+        try:
+            row_session_id = (
+                raw_session_id
+                if isinstance(raw_session_id, uuid.UUID)
+                else uuid.UUID(str(raw_session_id))
+            )
+        except ValueError, AttributeError:
+            continue
+
+        source_log = first_log_by_session.get(row_session_id)
+        if source_log is None:
+            continue
+
+        # Convert the feature row to a plain dict and sanitize all values
+        # (numpy types, UUID objects, etc.) to JSON-serialisable primitives.
+        payload_dict = _sanitize_payload(feature_row.to_dict())
+        payload_dict["session_id"] = str(row_session_id)
+
         cleaned_logs.append(
             CleanedCombatLog(
                 source_combat_log_id=source_log.id,
-                session_id=source_log.session_id,
+                session_id=row_session_id,
                 player_id=source_log.player_id,
-                cleaned_payload=feature_row,
+                cleaned_payload=payload_dict,
             )
         )
 
@@ -217,4 +273,3 @@ def clean_combat_logs(
             db.refresh(cleaned_log)
 
     return cleaned_logs
-
