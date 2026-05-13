@@ -3,13 +3,13 @@ from datetime import datetime
 
 from sqlalchemy import (
     JSON,
+    UUID,
     Boolean,
     CheckConstraint,
     DateTime,
     Float,
     Integer,
     String,
-    UUID,
     func,
 )
 from sqlalchemy import Enum as SQLEnum
@@ -41,7 +41,7 @@ class CombatLog(Base):
     __tablename__ = "combat_logs"
     __table_args__ = (
         CheckConstraint(
-            "character_id BETWEEN 1 AND 2", name="combat_logs_character_id_range"
+            "character_id BETWEEN 0 AND 2", name="combat_logs_character_id_range"
         ),
     )
 
@@ -119,7 +119,6 @@ class MLPrediction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-
 
 
 class MLModelComparison(Base):
