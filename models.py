@@ -41,7 +41,7 @@ class CombatLog(Base):
     __tablename__ = "combat_logs"
     __table_args__ = (
         CheckConstraint(
-            "character_id BETWEEN 0 AND 2", name="combat_logs_character_id_range"
+            "character_id BETWEEN 1 AND 2", name="combat_logs_character_id_range"
         ),
     )
 
@@ -65,7 +65,7 @@ class CombatLog(Base):
     current_corrupt_blood_gain: Mapped[float] = mapped_column(Float, nullable=False)
     corrupt_blood_by_max_hp: Mapped[float] = mapped_column(Float, nullable=False)
     weather: Mapped[WeatherType] = mapped_column(
-        SQLEnum(WeatherType, name="weather_type_enum"), nullable=False
+        SQLEnum(String, name="weather_type_enum"), nullable=False
     )
     momentum_gain: Mapped[int] = mapped_column(Integer, nullable=False)
     momentum_used: Mapped[int] = mapped_column(Integer, nullable=False)
