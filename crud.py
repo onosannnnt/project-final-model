@@ -240,7 +240,7 @@ def clean_combat_logs(
                 if isinstance(raw_session_id, uuid.UUID)
                 else uuid.UUID(str(raw_session_id))
             )
-        except ValueError, AttributeError:
+        except (ValueError, AttributeError):
             continue
 
         source_log = first_log_by_session.get(row_session_id)

@@ -30,7 +30,7 @@ def _get_skill(skill_id) -> dict:
         return {}
     try:
         return _SKILL_META.get(int(skill_id), {})
-    except ValueError, TypeError:
+    except (ValueError, TypeError)  :
         return {}
 
 
