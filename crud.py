@@ -212,16 +212,12 @@ def clean_combat_logs(
 
     raw_df = pd.DataFrame(raw_rows)
     features_df = build_features(raw_df)
+    features_df = features_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    feature_rows = features_df.to_dict(orient="records")
 
-    if features_df.empty:
-        return []
-
-    # ---------- build lookup: session_id -> first CombatLog ----------
-    # Preserves the sorted order from the query above.
-    first_log_by_session: dict[uuid.UUID, CombatLog] = {}
+    logs_by_session: dict[str, list[CombatLog]] = {}
     for log in combat_logs:
-        if log.session_id not in first_log_by_session:
-            first_log_by_session[log.session_id] = log
+        logs_by_session.setdefault(str(log.session_id), []).append(log)
 
     # ---------- delete stale cleaned rows for affected sessions ----------
     target_sessions = {log.session_id for log in combat_logs}
@@ -231,11 +227,10 @@ def clean_combat_logs(
 
     # ---------- insert one CleanedCombatLog per feature row ----------
     cleaned_logs: list[CleanedCombatLog] = []
-
-    for _, feature_row in features_df.iterrows():
-        # build_features must keep session_id in the output row.
-        raw_session_id = feature_row.get("session_id")
-        if raw_session_id is None:
+    for feature_row in feature_rows:
+        feature_session_id = str(feature_row.get("session_id"))
+        session_logs = logs_by_session.get(feature_session_id, [])
+        if not session_logs:
             continue
 
         # Normalise to uuid.UUID regardless of whether it came back as str/UUID.

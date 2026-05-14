@@ -499,6 +499,9 @@ def build_features(raw_df):
     existing_agg = {k: v for k, v in aggregation_dict.items() if k in df.columns}
 
     session_df = df.groupby("session_id").agg(existing_agg).reset_index()
+    if "session_id" in session_df.columns:
+        # Ensure JSON-serializable session IDs.
+        session_df["session_id"] = session_df["session_id"].astype(str)
 
     # ------------------------------
     # Final Selected Features
