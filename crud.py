@@ -1,6 +1,7 @@
 import uuid
 from uuid import UUID
 
+import numpy as np
 import pandas as pd
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
@@ -182,11 +183,12 @@ def clean_combat_logs(
 
     raw_df = pd.DataFrame(raw_rows)
     features_df = build_features(raw_df)
+    features_df = features_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     feature_rows = features_df.to_dict(orient="records")
 
-    logs_by_session: dict[UUID, list[CombatLog]] = {}
+    logs_by_session: dict[str, list[CombatLog]] = {}
     for log in combat_logs:
-        logs_by_session.setdefault(log.session_id, []).append(log)
+        logs_by_session.setdefault(str(log.session_id), []).append(log)
 
     target_sessions = {log.session_id for log in combat_logs}
     db.execute(
@@ -195,7 +197,7 @@ def clean_combat_logs(
 
     cleaned_logs: list[CleanedCombatLog] = []
     for feature_row in feature_rows:
-        feature_session_id = feature_row["session_id"]
+        feature_session_id = str(feature_row.get("session_id"))
         session_logs = logs_by_session.get(feature_session_id, [])
         if not session_logs:
             continue
