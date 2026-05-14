@@ -219,6 +219,11 @@ def clean_combat_logs(
     for log in combat_logs:
         logs_by_session.setdefault(str(log.session_id), []).append(log)
 
+    # Build a UUID-keyed map to the first log of each session
+    first_log_by_session: dict[uuid.UUID, CombatLog] = {
+        uuid.UUID(sid): logs[0] for sid, logs in logs_by_session.items()
+    }
+
     # ---------- delete stale cleaned rows for affected sessions ----------
     target_sessions = {log.session_id for log in combat_logs}
     db.execute(
@@ -228,11 +233,9 @@ def clean_combat_logs(
     # ---------- insert one CleanedCombatLog per feature row ----------
     cleaned_logs: list[CleanedCombatLog] = []
     for feature_row in feature_rows:
-        feature_session_id = str(feature_row.get("session_id"))
-        session_logs = logs_by_session.get(feature_session_id, [])
-        if not session_logs:
+        raw_session_id = feature_row.get("session_id")
+        if raw_session_id is None:
             continue
-
         # Normalise to uuid.UUID regardless of whether it came back as str/UUID.
         try:
             row_session_id = (
@@ -240,16 +243,16 @@ def clean_combat_logs(
                 if isinstance(raw_session_id, uuid.UUID)
                 else uuid.UUID(str(raw_session_id))
             )
-        except (ValueError, AttributeError):
+        except ValueError, AttributeError:
             continue
 
         source_log = first_log_by_session.get(row_session_id)
         if source_log is None:
             continue
 
-        # Convert the feature row to a plain dict and sanitize all values
-        # (numpy types, UUID objects, etc.) to JSON-serialisable primitives.
-        payload_dict = _sanitize_payload(feature_row.to_dict())
+        # feature_row is already a plain dict (from to_dict(orient="records")),
+        # so sanitize it directly without calling .to_dict() again.
+        payload_dict = _sanitize_payload(feature_row)
         payload_dict["session_id"] = str(row_session_id)
 
         cleaned_logs.append(
