@@ -15,6 +15,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from cleaned import build_features
+from cluster_features import FEATURES
 from models import (
     CleanedCombatLog,
     CombatLog,
@@ -31,9 +32,74 @@ class ModelNotReadyError(RuntimeError):
     pass
 
 
-def cluster_to_user_type(label: int) -> str:
-    mapping = {0: "EL", 1: "RV", 2: "CE"}
-    return mapping.get(label % 3, "EL")
+def cluster_to_user_type(label: int, cluster_mapping: dict | None = None) -> str:
+    if cluster_mapping:
+        # Ensure keys are integers (json.dump might convert them to strings)
+        mapping = {int(k): v for k, v in cluster_mapping.items()}
+        return mapping.get(label, "EL")
+    return {0: "EL", 1: "RV", 2: "CE"}.get(label % 3, "EL")
+
+
+def _compute_cluster_mapping(model, feature_columns) -> dict[int, str]:
+    """
+    Heuristically determine which cluster corresponds to which user type
+    based on the cluster centers.
+    """
+    n_clusters = getattr(model, "n_clusters", 3)
+    if not hasattr(model, "cluster_centers_"):
+        return {0: "EL", 1: "RV", 2: "CE"}
+
+    centers = model.cluster_centers_
+    mapping = {}
+    available_clusters = list(range(len(centers)))
+
+    # Archetype identifying features - priority order
+    archetypes = [
+        ("RV", "rv_used"),
+        ("CE", "ce_used"),
+        ("EL", "el_used"),
+    ]
+
+    for arch, feat in archetypes:
+        if feat in feature_columns and available_clusters:
+            idx = feature_columns.index(feat)
+            # Find cluster with highest value for this feature among available
+            sub_centers = centers[available_clusters, idx]
+            if np.max(sub_centers) > 0:
+                local_idx = np.argmax(sub_centers)
+                cluster = available_clusters[local_idx]
+                mapping[int(cluster)] = arch
+                available_clusters.remove(cluster)
+
+    # Fill remaining clusters with unused archetypes
+    all_archs = ["EL", "RV", "CE"]
+    used_archs = set(mapping.values())
+    remaining_archs = [a for a in all_archs if a not in used_archs]
+
+    for i in range(len(centers)):
+        if i not in mapping:
+            if remaining_archs:
+                mapping[i] = remaining_archs.pop(0)
+            else:
+                mapping[i] = "EL"
+
+    return mapping
+
+
+def get_active_model_mapping(db: Session) -> dict[int, str]:
+    active = get_active_model_version(db)
+    if not active:
+        return {}
+    try:
+        artifact = _load_artifact(active)
+        if "cluster_mapping" in artifact:
+            return artifact["cluster_mapping"]
+        # Fallback for models without stored mapping
+        model = artifact["model"]
+        feature_columns = artifact.get("feature_columns", active.feature_columns)
+        return _compute_cluster_mapping(model, feature_columns)
+    except Exception:
+        return {0: "EL", 1: "RV", 2: "CE"}
 
 
 # Columns that must be dropped before numeric feature extraction.
@@ -74,7 +140,12 @@ def _to_feature_frame(rows: list[CleanedCombatLog]) -> pd.DataFrame:
         .fillna(0.0)
         .clip(lower=np.finfo(np.float64).min / 2, upper=np.finfo(np.float64).max / 2)
     )
-    return numeric_df
+
+    # Select only the declared FEATURES columns, adding any missing ones as 0.0
+    for col in FEATURES:
+        if col not in numeric_df.columns:
+            numeric_df[col] = 0.0
+    return numeric_df[FEATURES]
 
 
 def _artifact_path(version: str) -> Path:
@@ -190,11 +261,14 @@ def train_kmeans_from_cleaned(
     if len(set(labels)) > 1 and n_samples > len(set(labels)):
         metrics["silhouette_score"] = float(silhouette_score(feature_df, labels))
 
+    cluster_mapping = _compute_cluster_mapping(model, feature_df.columns.tolist())
+
     artifact = {
         "algorithm": "kmeans",
         "version": version,
         "feature_columns": feature_df.columns.tolist(),
         "model": model,
+        "cluster_mapping": cluster_mapping,
         "trained_at": datetime.utcnow().isoformat(),
     }
     artifact_path = _artifact_path(version)

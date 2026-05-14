@@ -416,7 +416,8 @@ def stage_complete(
     except ml_service.ModelNotReadyError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
-    predicted_type = ml_service.cluster_to_user_type(cluster_label)
+    mapping = ml_service.get_active_model_mapping(db)
+    predicted_type = ml_service.cluster_to_user_type(cluster_label, mapping)
 
     previous_type = user.type
     previous_tier = user.tier
