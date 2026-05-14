@@ -235,36 +235,3 @@ class StageCompleteResponse(BaseModel):
     predicted_cluster: int
     model_version: str
     update_mode: str
-
-
-
-class ProjectSummaryResponse(BaseModel):
-    combat_logs: int
-    cleaned_combat_logs: int
-    predictions: int
-    model_versions: int
-    active_model: str | None
-    latest_comparison_id: int | None
-    latest_comparison_winner: str | None
-
-
-class ReadyResponse(BaseModel):
-    api: str
-    database: str
-    active_model: str
-
-
-class StageCompleteRequest(BaseModel):
-    player_id: int
-    combat_logs: list[CombatLogCreate]
-
-
-class StageCompleteResponse(BaseModel):
-    user_id: int
-    previous_type: UserType | None
-    new_type: UserType
-    previous_tier: int | None
-    new_tier: int
-    predicted_cluster: int
-    model_version: str
-    update_mode: str

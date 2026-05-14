@@ -36,20 +36,44 @@ def cluster_to_user_type(label: int) -> str:
     return mapping.get(label % 3, "EL")
 
 
+# Columns that must be dropped before numeric feature extraction.
+# session_id is stored as a string UUID inside cleaned_payload and must
+# be excluded so it doesn't interfere with numeric coercion.
+_NON_FEATURE_COLS = {"session_id", "player_id"}
+
+
 def _to_feature_frame(rows: list[CleanedCombatLog]) -> pd.DataFrame:
+    """
+    Converts a list of CleanedCombatLog ORM rows into a numeric feature
+    DataFrame ready for model training / comparison.
+
+    Steps:
+      1. Explode cleaned_payload dicts into a DataFrame.
+      2. Drop known non-numeric identifier columns (session_id, player_id).
+      3. Coerce remaining columns to numeric; keep only numeric ones.
+      4. Replace inf/NaN with 0.
+    """
     payloads = [row.cleaned_payload for row in rows]
     if not payloads:
         return pd.DataFrame()
 
     df = pd.DataFrame(payloads)
+
+    # Drop identifier columns before numeric coercion so they don't
+    # become all-NaN numeric columns that pollute the feature space.
+    cols_to_drop = [c for c in _NON_FEATURE_COLS if c in df.columns]
+    if cols_to_drop:
+        df = df.drop(columns=cols_to_drop)
+
     for col in list(df.columns):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     numeric_df = df.select_dtypes(include=[np.number]).copy()
-    if "session_id" in numeric_df.columns:
-        numeric_df = numeric_df.drop(columns=["session_id"])
-
-    numeric_df = numeric_df.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    numeric_df = (
+        numeric_df.replace([np.inf, -np.inf], np.nan)
+        .fillna(0.0)
+        .clip(lower=np.finfo(np.float64).min / 2, upper=np.finfo(np.float64).max / 2)
+    )
     return numeric_df
 
 
@@ -78,7 +102,7 @@ def _combat_log_to_row(log: CombatLog) -> dict[str, Any]:
         "heal_amount": log.heal_amount,
         "current_corrupt_blood_gain": log.current_corrupt_blood_gain,
         "corrupt_blood_by_max_hp": log.corrupt_blood_by_max_hp,
-        "weather": log.weather.value,
+        "weather": str(log.weather),
         "momentum_gain": log.momentum_gain,
         "momentum_used": log.momentum_used,
         "break_count": 0,
@@ -88,6 +112,25 @@ def _combat_log_to_row(log: CombatLog) -> dict[str, Any]:
     }
 
 
+def _sanitize_payload(d: dict) -> dict:
+    """Convert all values to JSON-serialisable Python primitives."""
+    result = {}
+    for k, v in d.items():
+        if isinstance(v, UUID):
+            result[k] = str(v)
+        elif isinstance(v, np.integer):
+            result[k] = int(v)
+        elif isinstance(v, np.floating):
+            result[k] = float(v)
+        elif isinstance(v, np.bool_):
+            result[k] = bool(v)
+        elif isinstance(v, float) and (np.isnan(v) or np.isinf(v)):
+            result[k] = 0.0
+        else:
+            result[k] = v
+    return result
+
+
 def build_feature_payload_from_combat_logs(
     log_rows: list[dict[str, Any]],
 ) -> dict[str, float]:
@@ -95,7 +138,7 @@ def build_feature_payload_from_combat_logs(
     features_df = build_features(raw_df)
     if features_df.empty:
         return {}
-    return dict(features_df.iloc[0].to_dict())
+    return _sanitize_payload(features_df.iloc[0].to_dict())
 
 
 def build_feature_payload_from_combat_log(log: CombatLog) -> dict[str, float]:
@@ -108,18 +151,32 @@ def train_kmeans_from_cleaned(
     n_clusters: int = 3,
     session_ids: list[UUID] | None = None,
 ) -> MLModelVersion:
+    """
+    Trains a KMeans model using rows already stored in cleaned_combat_logs.
+
+    If session_ids is provided only those sessions are used; otherwise
+    all cleaned rows are used.
+    """
     query = select(CleanedCombatLog)
     if session_ids:
         query = query.where(CleanedCombatLog.session_id.in_(session_ids))
 
     rows = list(db.scalars(query.order_by(CleanedCombatLog.id.asc())).all())
+
+    if not rows:
+        raise ValueError(
+            "No cleaned combat log rows found"
+            + (f" for session_ids={session_ids}" if session_ids else "")
+            + ". Run the clean pipeline first."
+        )
+
     feature_df = _to_feature_frame(rows)
     if feature_df.empty:
-        raise ValueError("No cleaned features available to train model.")
+        raise ValueError("Cleaned rows produced no numeric features to train on.")
 
     n_samples = len(feature_df)
     if n_samples < 2:
-        raise ValueError("Need at least 2 cleaned rows to train clustering model.")
+        raise ValueError("Need at least 2 cleaned rows to train a clustering model.")
 
     clusters = max(2, min(n_clusters, n_samples))
     model = KMeans(n_clusters=clusters, random_state=42, n_init=10)

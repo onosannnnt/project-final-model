@@ -3,13 +3,13 @@ from datetime import datetime
 
 from sqlalchemy import (
     JSON,
+    UUID,
     Boolean,
     CheckConstraint,
     DateTime,
     Float,
     Integer,
     String,
-    UUID,
     func,
 )
 from sqlalchemy import Enum as SQLEnum
@@ -64,9 +64,7 @@ class CombatLog(Base):
     heal_amount: Mapped[float] = mapped_column(Float, nullable=False)
     current_corrupt_blood_gain: Mapped[float] = mapped_column(Float, nullable=False)
     corrupt_blood_by_max_hp: Mapped[float] = mapped_column(Float, nullable=False)
-    weather: Mapped[WeatherType] = mapped_column(
-        SQLEnum(WeatherType, name="weather_type_enum"), nullable=False
-    )
+    weather: Mapped[String] = mapped_column(String, nullable=False)
     momentum_gain: Mapped[int] = mapped_column(Integer, nullable=False)
     momentum_used: Mapped[int] = mapped_column(Integer, nullable=False)
 
@@ -119,7 +117,6 @@ class MLPrediction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-
 
 
 class MLModelComparison(Base):

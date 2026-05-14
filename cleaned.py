@@ -30,7 +30,7 @@ def _get_skill(skill_id) -> dict:
         return {}
     try:
         return _SKILL_META.get(int(skill_id), {})
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return {}
 
 
@@ -576,7 +576,10 @@ def build_features(raw_df):
 
     final_features = [col for col in final_features if col in session_df.columns]
 
-    return session_df[final_features]
+    result = session_df[final_features].copy()
+    result.replace([np.inf, -np.inf], np.nan, inplace=True)
+    result.fillna(0, inplace=True)
+    return result
 
 
 # ------------------------------
